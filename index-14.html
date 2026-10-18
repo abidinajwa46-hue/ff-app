@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0712">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="فري فاير">
+<title>تنظيم فري فاير</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--stroke:rgba(255,255,255,.26);--hi:rgba(255,255,255,.45);--a:#ff8a3d;--b:#ff2e63}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Tajawal,system-ui,sans-serif;color:#fff;min-height:100vh;background:#0b0712;padding:env(safe-area-inset-top) 0 calc(120px + env(safe-area-inset-bottom));overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(60% 50% at 15% 10%,#ff2e63 0,transparent 70%),radial-gradient(55% 45% at 90% 35%,#ff8a3d 0,transparent 70%),radial-gradient(60% 50% at 40% 100%,#5b3cff 0,transparent 70%),#0b0712;opacity:.85}
+.glass{position:relative;margin:12px 16px;padding:18px;border-radius:30px;background:linear-gradient(145deg,rgba(255,255,255,.24),rgba(255,255,255,.05));backdrop-filter:blur(28px) saturate(190%);-webkit-backdrop-filter:blur(28px) saturate(190%);border:1px solid var(--stroke);box-shadow:inset 0 1px 0 var(--hi),inset 0 -1px 0 rgba(255,255,255,.08),0 16px 40px rgba(0,0,0,.28)}
+.glass.sm{border-radius:22px;margin:8px 0;padding:14px}
+h1{font-size:30px;font-weight:900;margin:6px 0}
+h2{font-size:24px;font-weight:900}
+h3{font-size:18px;font-weight:700;margin-bottom:8px}
+h4{font-size:15px;font-weight:700;margin-bottom:6px;opacity:.9}
+p{margin:4px 0;line-height:1.6}
+.muted{opacity:.7;font-size:14px}
+.top{padding:24px 20px 4px;font-size:14px;opacity:.75}
+input,select{width:100%;padding:14px 16px;margin:6px 0;border-radius:18px;border:1px solid var(--stroke);background:rgba(255,255,255,.12);color:#fff;font:inherit;font-size:16px;outline:none;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+input::placeholder{color:rgba(255,255,255,.6)}
+select option{color:#000}
+input:focus,select:focus{border-color:rgba(255,255,255,.7);box-shadow:0 0 0 3px rgba(255,138,61,.35)}
+.btn{display:block;width:100%;margin-top:8px;padding:15px;border:0;border-radius:20px;font:inherit;font-size:17px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--a),var(--b));box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 10px 26px rgba(255,46,99,.4);cursor:pointer;transition:transform .15s}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:rgba(255,255,255,.14);box-shadow:inset 0 1px 0 var(--hi)}
+.item{cursor:pointer;transition:transform .15s}
+.item:active{transform:scale(.98)}
+.badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:13px;background:rgba(255,255,255,.2);margin-inline-start:6px}
+.teams{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.teams .glass.sm{margin:0}
+.back{background:none;border:0;color:#fff;font:inherit;font-size:17px;padding:14px 20px;cursor:pointer}
+#msgs{max-height:300px;overflow-y:auto;padding:4px 0}
+.msg{background:rgba(255,255,255,.12);border-radius:16px;padding:10px 14px;margin:6px 0}
+.msg b{color:#ffd1a8}
+#tabbar{position:fixed;bottom:calc(14px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;gap:4px;padding:7px;border-radius:34px;background:rgba(255,255,255,.14);backdrop-filter:blur(34px) saturate(200%);-webkit-backdrop-filter:blur(34px) saturate(200%);border:1px solid var(--stroke);box-shadow:inset 0 1px 0 var(--hi),0 16px 40px rgba(0,0,0,.4);z-index:10}
+.tb{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:86px;padding:9px 14px;border:0;border-radius:26px;background:none;color:#fff;font:inherit;font-size:21px;opacity:.6;cursor:pointer}
+.tb small{font-size:12px}
+.tb.on{opacity:1;background:rgba(255,255,255,.22);box-shadow:inset 0 1px 0 var(--hi)}
+.empty{text-align:center;padding:24px 0}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div id="app"></div>
+<p style="text-align:center;opacity:.55;font-size:13px;margin-top:10px">by apex¿!hz™</p>
+<nav id="tabbar" style="display:none">
+  <button class="tb" data-act="tab" data-tab="t">🏆<small>البطولات</small></button>
+  <button class="tb" data-act="tab" data-tab="c">🛡️<small>الكلانات</small></button>
+  <button class="tb" data-act="tab" data-tab="p">👤<small>حسابي</small></button>
+</nav>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+/* ==== 1) ضع إعدادات مشروعك من Firebase هنا ==== */
+const firebaseConfig = {
+  apiKey: "AIzaSyB8U7K1TZad113atUQjcEfmbZRpNS6QqJ0",
+  authDomain: "tournoi-1dcc5.firebaseapp.com",
+  projectId: "tournoi-1dcc5",
+  storageBucket: "tournoi-1dcc5.firebasestorage.app",
+  messagingSenderId: "304672791808",
+  appId: "1:304672791808:web:b2fb2b1d817aa85ff8a7e5"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const FV = firebase.firestore.FieldValue;
+
+/* ==== 2) الحالة ==== */
+const app = document.getElementById('app');
+const view = { tab: 't', detail: null };
+let me = null;
+let unsubs = [];
+const clearL = () => { unsubs.forEach(f => f()); unsubs = []; };
+const listen = (ref, fn) => unsubs.push(ref.onSnapshot(fn));
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const newCode = () => Math.random().toString(36).slice(2, 8).toUpperCase();
+const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const toast = msg => showToast(msg);
+
+/* ==== 3) تسجيل الدخول: يبقى محفوظاً حتى بعد حذف التطبيق ==== */
+auth.onAuthStateChanged(u => { me = u; view.detail = null; render(); });
+
+/* ==== 4) العرض الرئيسي ==== */
+function render() {
+  clearL();
+  if (!me) {
+    document.getElementById('tabbar').style.display = 'none';
+    app.innerHTML = `<div class="glass"><h1 class="center">🔥 تنظيم فري فاير</h1>
+      <p class="muted center">أنشئ بطولاتك وكلاناتك وانضم لأصدقائك بكود بسيط</p>
+      <input id="nm" placeholder="الاسم (للتسجيل فقط)" maxlength="30">
+      <input id="em" type="email" placeholder="البريد الإلكتروني" autocomplete="email">
+      <input id="pw" type="password" placeholder="كلمة السر (6 أحرف على الأقل)" autocomplete="current-password">
+      <button class="btn" data-act="login">تسجيل الدخول</button>
+      <button class="btn ghost" data-act="register">إنشاء حساب جديد</button></div>`;
+    return;
+  }
+  document.getElementById('tabbar').style.display = 'flex';
+  document.querySelectorAll('.tb').forEach(b => b.classList.toggle('on', b.dataset.tab === view.tab));
+  if (view.detail) return view.detail.type === 't' ? tDetail(view.detail.id) : cDetail(view.detail.id);
+  if (view.tab === 't') return tournamentsView();
+  if (view.tab === 'c') return clansView();
+  return profileView();
+}
+
+/* ==== 5) البطولات ==== */
+function tournamentsView() {
+  app.innerHTML = `<div class="top">مرحباً ${esc(me.displayName || '')}</div>
+    <div class="glass"><h3>بطولة جديدة</h3>
+      <input id="tn" placeholder="اسم البطولة" maxlength="40">
+      <input id="tm" type="number" min="4" max="12" value="12" placeholder="عدد اللاعبين (4 - 12)">
+      <button class="btn" data-act="createT">إنشاء البطولة</button></div>
+    <div class="glass"><h3>انضم بالكود</h3>
+      <input id="jc" placeholder="كود البطولة" maxlength="6">
+      <button class="btn ghost" data-act="joinT">انضم</button></div>
+    <div id="list" style="padding:0 0 8px"></div>`;
+  listen(db.collection('tournaments').where('uids', 'array-contains', me.uid), s => {
+    const list = s.docs.map(d => ({ id: d.id, ...d.data() }));
+    const el = document.getElementById('list');
+    if (!el) return;
+    el.innerHTML = list.length
+      ? list.map(t => `<div class="glass item" data-act="openT" data-id="${esc(t.id)}">
+          <h3>${esc(t.name)}</h3>
+          <span class="badge">${t.uids.length}/${t.max} لاعب</span>
+          <span class="badge">كود: ${esc(t.id)}</span>
+          ${t.teams ? '<span class="badge">تم توزيع الفرق</span>' : ''}</div>`).join('')
+      : `<div class="glass empty muted">لا توجد بطولات بعد. أنشئ واحدة أو انضم بكود.</div>`;
+  });
+}
+
+function tDetail(id) {
+  listen(db.collection('tournaments').doc(id), s => {
+    const t = s.data();
+    if (!t) { app.innerHTML = `<button class="back" data-act="back">‹ رجوع</button><div class="glass empty">البطولة غير موجودة</div>`; return; }
+    const isOwner = t.owner === me.uid;
+    const full = t.uids.length >= t.max;
+    const joined = t.uids.includes(me.uid);
+    const teamsHTML = t.teams ? `<h4 style="margin-top:14px">الفرق (${t.teams.A.length} ضد ${t.teams.B.length})</h4>
+      <div class="teams">
+        <div class="glass sm"><h4>الفريق A</h4>${t.teams.A.map(n => `<p>${esc(n)}</p>`).join('')}</div>
+        <div class="glass sm"><h4>الفريق B</h4>${t.teams.B.map(n => `<p>${esc(n)}</p>`).join('')}</div>
+      </div>` : '';
+    app.innerHTML = `<button class="back" data-act="back">‹ رجوع</button>
+      <div class="glass">
+        <h2>${esc(t.name)}</h2>
+        <p class="muted">الكود: <b>${esc(s.id)}</b> · ${t.uids.length}/${t.max} لاعب</p>
+        ${joined || isOwner ? '' : (full ? '<p class="muted">البطولة ممتلئة</p>' : `<button class="btn" data-act="joinId" data-id="${esc(s.id)}">انضم للبطولة</button>`)}
+        ${isOwner && full && !t.teams ? `<button class="btn" data-act="split" data-id="${esc(s.id)}">توزيع الفرق عشوائياً</button>` : ''}
+        ${teamsHTML}
+        <h4 style="margin-top:14px">اللاعبون</h4>
+        ${t.players.map(p => `<p>• ${esc(p.name)}${p.uid === t.owner ? ' <span class="badge">المنظم</span>' : ''}</p>`).join('')}
+      </div>`;
+  });
+}
+
+/* ==== 6) الكلانات ==== */
+function clansView() {
+  app.innerHTML = `<div class="top">الكلانات</div>
+    <div class="glass"><h3>كلان جديد</h3>
+      <input id="cn" placeholder="اسم الكلان" maxlength="40">
+      <button class="btn" data-act="createC">إنشاء الكلان</button></div>
+    <div class="glass"><h3>انضم لكلان بالكود</h3>
+      <input id="cj" placeholder="كود الكلان" maxlength="6">
+      <button class="btn ghost" data-act="joinC">انضم</button></div>
+    <div id="clist" style="padding:0 0 8px"></div>`;
+  listen(db.collection('clans').where('uids', 'array-contains', me.uid), s => {
+    const list = s.docs.map(d => ({ id: d.id, ...d.data() }));
+    const el = document.getElementById('clist');
+    if (!el) return;
+    el.innerHTML = list.length
+      ? list.map(c => `<div class="glass item" data-act="openC" data-id="${esc(c.id)}">
+          <h3>${esc(c.name)}</h3>
+          <span class="badge">${c.leader === me.uid ? 'أنت القائد' : 'عضو'}</span>
+          <span class="badge">${c.uids.length} عضو</span></div>`).join('')
+      : `<div class="glass empty muted">لا توجد كلانات بعد</div>`;
+  });
+}
+
+function cDetail(id) {
+  app.innerHTML = `<button class="back" data-act="back">‹ رجوع</button>
+    <div class="glass" id="chead"></div>
+    <div class="glass"><h3>الدردشة</h3><div id="msgs"></div><div id="cinput"></div></div>`;
+  listen(db.collection('clans').doc(id), s => {
+    const c = s.data();
+    const head = document.getElementById('chead');
+    if (!c || !head) return;
+    const isLeader = c.leader === me.uid;
+    const room = c.room;
+    const inRoom = room && room.uids.includes(me.uid);
+    head.innerHTML = `<h2>${esc(c.name)}</h2>
+      <p class="muted">الكود: <b>${esc(s.id)}</b> · ${c.members.length} عضو</p>
+      <h4 style="margin-top:10px">الأعضاء</h4>
+      ${c.members.map(m => `<p>• ${esc(m.name)}${m.uid === c.leader ? ' <span class="badge">القائد</span>' : ''}</p>`).join('')}
+      <h4 style="margin-top:14px">غرفة الكلان</h4>
+      ${room ? `<p><b>${esc(room.name)}</b> · ${room.uids.length} منضم</p>
+        ${room.players.map(p => `<p>• ${esc(p.name)}</p>`).join('')}
+        ${inRoom ? '' : `<button class="btn ghost" data-act="joinRoom" data-id="${esc(s.id)}">انضم للغرفة</button>`}
+        ${isLeader ? `<button class="btn ghost" data-act="closeRoom" data-id="${esc(s.id)}">إغلاق الغرفة</button>` : ''}`
+        : (isLeader ? `<button class="btn" data-act="openRoom" data-id="${esc(s.id)}">فتح غرفة جديدة</button>` : '<p class="muted">لا توجد غرفة مفتوحة</p>')}`;
+    document.getElementById('cinput').innerHTML = isLeader
+      ? `<input id="mtxt" placeholder="اكتب رسالة للكلان" maxlength="300"><button class="btn" data-act="send" data-id="${esc(s.id)}">إرسال</button>`
+      : '<p class="muted">القائد فقط يستطيع الكتابة</p>';
+  });
+  listen(db.collection('clans').doc(id).collection('messages').orderBy('at', 'asc').limitToLast(50), s => {
+    const el = document.getElementById('msgs');
+    if (!el) return;
+    el.innerHTML = s.docs.length
+      ? s.docs.map(d => { const m = d.data(); return `<div class="msg"><b>${esc(m.name)}:</b> ${esc(m.text)}</div>`; }).join('')
+      : '<p class="muted">لا توجد رسائل بعد</p>';
+    el.scrollTop = el.scrollHeight;
+  });
+}
+
+/* ==== 7) حسابي ==== */
+let pendingPhoto = null;
+
+function profileView() {
+  pendingPhoto = null;
+  app.innerHTML = `<div class="glass" id="pcard"></div>`;
+  listen(db.collection('users').doc(me.uid), s => {
+    const u = s.data() || {};
+    const photo = u.photo || me.photoURL || '';
+    const name = u.name || me.displayName || 'Apex_hz_08';
+    const username = u.username || '';
+    const el = document.getElementById('pcard');
+    if (!el) return;
+    el.innerHTML = `<div class="empty" style="padding-top:8px">
+        ${photo ? `<img src="${esc(photo)}" alt="" style="width:96px;height:96px;border-radius:50%;object-fit:cover;border:2px solid var(--stroke)">` : '<div style="font-size:64px">🎮</div>'}
+        <h2>${esc(name)}</h2>
+        <p class="muted">${username ? '@' + esc(username) : 'لم تختر يوزراً بعد'}</p>
+        <p class="muted">${esc(me.email || '')}</p>
+      </div>
+      <label class="btn ghost" style="display:block;text-align:center;cursor:pointer">تغيير الصورة
+        <input type="file" accept="image/*" id="pf" style="display:none"></label>
+      <h4 style="margin-top:14px">الاسم</h4>
+      <input id="pn" placeholder="اسمك" maxlength="30" value="${esc(name)}">
+      <h4 style="margin-top:8px">اليوزر</h4>
+      <input id="pu" placeholder="مثال: Apex_hz_08" maxlength="20" value="${esc(username)}">
+      <button class="btn" data-act="saveProfile">حفظ التغييرات</button>
+      <button class="btn ghost" data-act="changePass">تغيير كلمة السر</button>
+      <button class="btn ghost" data-act="toggleLang">${lang === 'ar' ? '🌐 Langue : Français' : '🌐 اللغة: العربية'}</button>
+      <button class="btn ghost" data-act="contactDev">تواصل مع المطور</button>
+      <button class="btn ghost" data-act="logout">تسجيل الخروج</button>`;
+  });
+}
+
+function resizeImage(file) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const S = 160;
+        const s = S / Math.min(img.width, img.height);
+        const c = document.createElement('canvas');
+        c.width = c.height = S;
+        const w = img.width * s, h = img.height * s;
+        c.getContext('2d').drawImage(img, (S - w) / 2, (S - h) / 2, w, h);
+        resolve(c.toDataURL('image/jpeg', 0.8));
+      };
+      img.onerror = reject;
+      img.src = r.result;
+    };
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+
+function authMsg(e) {
+  const m = {
+    'auth/invalid-email': 'البريد الإلكتروني غير صالح',
+    'auth/missing-password': 'أدخل كلمة السر',
+    'auth/invalid-credential': 'البريد أو كلمة السر غير صحيحة',
+    'auth/wrong-password': 'كلمة السر غير صحيحة',
+    'auth/user-not-found': 'لا يوجد حساب بهذا البريد',
+    'auth/email-already-in-use': 'هذا البريد مسجل بالفعل',
+    'auth/weak-password': 'كلمة السر ضعيفة (6 أحرف على الأقل)',
+    'auth/too-many-requests': 'محاولات كثيرة، انتظر قليلاً ثم حاول مجدداً'
+  };
+  return m[e.code] || e.message;
+}
+
+/* ==== 8) الأحداث ==== */
+const handlers = {
+  login: async () => {
+    const email = document.getElementById('em').value.trim();
+    const pw = document.getElementById('pw').value;
+    if (!email || !pw) return toast('أدخل البريد وكلمة السر');
+    try { await auth.signInWithEmailAndPassword(email, pw); }
+    catch (e) { toast(authMsg(e)); }
+  },
+  register: async () => {
+    const name = document.getElementById('nm').value.trim();
+    const email = document.getElementById('em').value.trim();
+    const pw = document.getElementById('pw').value;
+    if (!name) return toast('اكتب اسمك في الحقل الأول');
+    if (!email) return toast('أدخل البريد الإلكتروني');
+    if (pw.length < 6) return toast('كلمة السر يجب أن تكون 6 أحرف على الأقل');
+    try {
+      const cred = await auth.createUserWithEmailAndPassword(email, pw);
+      await cred.user.updateProfile({ displayName: name });
+      render();
+    } catch (e) { toast(authMsg(e)); }
+  },
+  logout: () => auth.signOut(),
+
+  changePass: async () => {
+    try {
+      await auth.sendPasswordResetEmail(me.email);
+      toast('تم إرسال رسالة التحقق إلى بريدك الإلكتروني. افتح الرابط لتعيين كلمة سر جديدة');
+    } catch (e) { toast(authMsg(e)); }
+  },
+
+  toggleLang: () => {
+    lang = lang === 'ar' ? 'fr' : 'ar';
+    try { localStorage.setItem('lang', lang); } catch (e) {}
+    applyDir();
+    render();
+  },
+
+  contactDev: () => window.open('https://www.tiktok.com/@apexhz08', '_blank'),
+
+  saveProfile: async () => {
+    const name = document.getElementById('pn').value.trim();
+    const username = document.getElementById('pu').value.trim().replace(/^@/, '');
+    if (!name) return toast('اكتب اسمك');
+    if (username && !/^[A-Za-z0-9_.]{3,20}$/.test(username))
+      return toast('اليوزر: أحرف إنجليزية وأرقام و _ فقط (من 3 إلى 20)');
+    const data = { name, username };
+    if (pendingPhoto) data.photo = pendingPhoto;
+    try {
+      await db.collection('users').doc(me.uid).set(data, { merge: true });
+      await me.updateProfile({ displayName: name });
+      pendingPhoto = null;
+      toast('تم حفظ التغييرات');
+      render();
+    } catch (e) { toast(e.message); }
+  },
+  tab: el => { view.tab = el.dataset.tab; view.detail = null; render(); },
+  back: () => { view.detail = null; render(); },
+  openT: el => { view.detail = { type: 't', id: el.dataset.id }; render(); },
+  openC: el => { view.detail = { type: 'c', id: el.dataset.id }; render(); },
+
+  createT: async () => {
+    const name = document.getElementById('tn').value.trim();
+    const max = parseInt(document.getElementById('tm').value, 10);
+    if (!name) return toast('اكتب اسم البطولة');
+    if (!(max >= 4 && max <= 12 && max % 2 === 0)) return toast('عدد اللاعبين يجب أن يكون زوجياً بين 4 و 12');
+    const id = newCode();
+    const player = { uid: me.uid, name: me.displayName || 'لاعب' };
+    await db.collection('tournaments').doc(id).set({
+      name, max, owner: me.uid, players: [player], uids: [me.uid], teams: null, createdAt: FV.serverTimestamp()
+    });
+    view.detail = { type: 't', id }; render();
+  },
+
+  joinT: () => joinTournament(document.getElementById('jc').value.trim().toUpperCase()),
+  joinId: el => joinTournament(el.dataset.id),
+
+  split: async el => {
+    const ref = db.collection('tournaments').doc(el.dataset.id);
+    const snap = await ref.get();
+    const t = snap.data();
+    if (!t || t.teams) return;
+    const shuffled = shuffle(t.players.map(p => p.name));
+    const half = t.max / 2;
+    await ref.update({ teams: { A: shuffled.slice(0, half), B: shuffled.slice(half) } });
+  },
+
+  createC: async () => {
+    const name = document.getElementById('cn').value.trim();
+    if (!name) return toast('اكتب اسم الكلان');
+    const id = newCode();
+    const member = { uid: me.uid, name: me.displayName || 'لاعب' };
+    await db.collection('clans').doc(id).set({
+      name, leader: me.uid, members: [member], uids: [me.uid], room: null, createdAt: FV.serverTimestamp()
+    });
+    view.detail = { type: 'c', id }; render();
+  },
+
+  joinC: async () => {
+    const id = document.getElementById('cj').value.trim().toUpperCase();
+    if (!id) return;
+    const ref = db.collection('clans').doc(id);
+    try {
+      await db.runTransaction(async tx => {
+        const c = (await tx.get(ref)).data();
+        if (!c) throw new Error('لا يوجد كلان بهذا الكود');
+        if (c.uids.includes(me.uid)) return;
+        tx.update(ref, {
+          uids: FV.arrayUnion(me.uid),
+          members: FV.arrayUnion({ uid: me.uid, name: me.displayName || 'لاعب' })
+        });
+      });
+      view.detail = { type: 'c', id }; render();
+    } catch (e) { toast(e.message); }
+  },
+
+  openC: el => { view.detail = { type: 'c', id: el.dataset.id }; render(); },
+
+  openRoom: async el => {
+    const name = await askText('اسم الغرفة (مثال: تدريب الليلة 8 مساءً)');
+    if (!name) return;
+    await db.collection('clans').doc(el.dataset.id).update({
+      room: { name: name.slice(0, 40), uids: [], players: [] }
+    });
+  },
+
+  joinRoom: async el => {
+    const ref = db.collection('clans').doc(el.dataset.id);
+    await db.runTransaction(async tx => {
+      const c = (await tx.get(ref)).data();
+      if (!c || !c.room || c.room.uids.includes(me.uid)) return;
+      tx.update(ref, {
+        'room.uids': FV.arrayUnion(me.uid),
+        'room.players': FV.arrayUnion({ uid: me.uid, name: me.displayName || 'لاعب' })
+      });
+    });
+  },
+
+  closeRoom: el => db.collection('clans').doc(el.dataset.id).update({ room: null }),
+
+  send: async el => {
+    const input = document.getElementById('mtxt');
+    const text = input.value.trim();
+    if (!text) return;
+    const ref = db.collection('clans').doc(el.dataset.id);
+    const c = (await ref.get()).data();
+    if (!c || c.leader !== me.uid) return; // القائد فقط
+    await ref.collection('messages').add({ text, name: me.displayName || 'القائد', at: FV.serverTimestamp() });
+    input.value = '';
+  }
+};
+
+async function joinTournament(id) {
+  if (!id) return toast('أدخل كود البطولة');
+  const ref = db.collection('tournaments').doc(id);
+  try {
+    await db.runTransaction(async tx => {
+      const t = (await tx.get(ref)).data();
+      if (!t) throw new Error('لا توجد بطولة بهذا الكود');
+      if (t.uids.includes(me.uid)) return;
+      if (t.uids.length >= t.max) throw new Error('البطولة ممتلئة');
+      tx.update(ref, {
+        uids: FV.arrayUnion(me.uid),
+        players: FV.arrayUnion({ uid: me.uid, name: me.displayName || 'لاعب' })
+      });
+    });
+    view.detail = { type: 't', id }; render();
+  } catch (e) { toast(e.message); }
+}
+
+/* ==== اللغة: العربية أو الفرنسية ==== */
+let lang = 'ar';
+try { lang = localStorage.getItem('lang') || 'ar'; } catch (e) {}
+const FR = {
+  'تسجيل الدخول': 'Connexion', 'إنشاء حساب جديد': 'Créer un compte',
+  'الاسم (للتسجيل فقط)': 'Nom (inscription seulement)', 'البريد الإلكتروني': 'E-mail',
+  'كلمة السر (6 أحرف على الأقل)': 'Mot de passe (6 caractères min.)',
+  'أنشئ بطولاتك وكلاناتك وانضم لأصدقائك بكود بسيط': 'Créez vos tournois et clans, rejoignez vos amis avec un code',
+  'البطولات': 'Tournois', 'الكلانات': 'Clans', 'حسابي': 'Compte',
+  'بطولة جديدة': 'Nouveau tournoi', 'اسم البطولة': 'Nom du tournoi', 'إنشاء البطولة': 'Créer le tournoi',
+  'انضم بالكود': 'Rejoindre avec un code', 'كود البطولة': 'Code du tournoi', 'انضم': 'Rejoindre',
+  'لا توجد بطولات بعد. أنشئ واحدة أو انضم بكود.': 'Aucun tournoi. Créez-en un ou rejoignez avec un code.',
+  '‹ رجوع': '‹ Retour', 'انضم للبطولة': 'Rejoindre le tournoi', 'البطولة ممتلئة': 'Tournoi complet',
+  'توزيع الفرق عشوائياً': 'Répartir les équipes au hasard', 'اللاعبون': 'Joueurs', 'المنظم': 'Organisateur',
+  'الفريق A': 'Équipe A', 'الفريق B': 'Équipe B', 'الأعضاء': 'Membres', 'القائد': 'Chef',
+  'غرفة الكلان': 'Salon du clan', 'لا توجد غرفة مفتوحة': 'Aucun salon ouvert',
+  'فتح غرفة جديدة': 'Ouvrir un salon', 'انضم للغرفة': 'Rejoindre le salon', 'إغلاق الغرفة': 'Fermer le salon',
+  'الكلانات': 'Clans', 'كلان جديد': 'Nouveau clan', 'اسم الكلان': 'Nom du clan', 'إنشاء الكلان': 'Créer le clan',
+  'انضم لكلان بالكود': 'Rejoindre un clan avec un code', 'كود الكلان': 'Code du clan',
+  'لا توجد كلانات بعد': 'Aucun clan pour le moment', 'الدردشة': 'Discussion', 'إرسال': 'Envoyer',
+  'القائد فقط يستطيع الكتابة': 'Seul le chef peut écrire', 'لا توجد رسائل بعد': 'Aucun message',
+  'اكتب رسالة للكلان': 'Écrivez un message au clan', 'أنت القائد': 'Vous êtes le chef', 'عضو': 'Membre',
+  'لم تختر يوزراً بعد': 'Pas encore de pseudo', 'تغيير الصورة': 'Changer la photo', 'الاسم': 'Nom',
+  'اليوزر': 'Pseudo', 'اسمك': 'Votre nom', 'حفظ التغييرات': 'Enregistrer', 'تسجيل الخروج': 'Se déconnecter',
+  'تغيير كلمة السر': 'Changer le mot de passe', 'تواصل مع المطور': 'Contacter le développeur',
+  'الكود': 'Code', 'لاعب': 'Joueur', 'البريد أو كلمة السر غير صحيحة': 'E-mail ou mot de passe incorrect'
+};
+function applyDir() {
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'fr' ? 'ltr' : 'rtl';
+}
+function translateTree(root) {
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  let n;
+  while ((n = w.nextNode())) {
+    const k = n.nodeValue.trim();
+    if (FR[k]) n.nodeValue = n.nodeValue.replace(k, FR[k]);
+  }
+  root.querySelectorAll('[placeholder]').forEach(el => {
+    const k = el.getAttribute('placeholder');
+    if (FR[k]) el.setAttribute('placeholder', FR[k]);
+  });
+}
+new MutationObserver(() => { if (lang === 'fr') translateTree(document.body); })
+  .observe(document.body, { childList: true, subtree: true });
+applyDir();
+
+/* ==== نظام البطولات: 1 ضد 1 وسكوادات 4 و 6 ==== */
+document.head.insertAdjacentHTML('beforeend', `<style>
+.mrow{padding:9px 12px;border-radius:12px;background:rgba(255,255,255,.1);margin:4px 0;font-size:15px}
+.mrow.win{background:linear-gradient(135deg,var(--a),var(--b));font-weight:700}
+.mcard{background:rgba(255,255,255,.08);border:1px solid var(--stroke);border-radius:18px;padding:8px;margin-bottom:12px}
+.bracket{display:flex;gap:14px;overflow-x:auto;padding:6px 2px 10px}
+.round{min-width:170px}
+.round h4{text-align:center;margin-bottom:10px}
+.mcard input{font-size:13px;padding:8px;margin:6px 0}
+.chip{border:0;color:#fff;background:rgba(255,255,255,.2);border-radius:12px;padding:3px 10px;font:inherit;font-size:13px;margin-inline-start:6px;cursor:pointer}
+</style>`);
+
+const MODES = {
+  solo: { label: 'بطولة 1 ضد 1', size: 1, max: 12 },
+  s4: { label: 'سكوادات 4 ضد 4', size: 4, max: 8 },
+  s6: { label: 'سكوادات 6 ضد 6', size: 6, max: 8 }
+};
+const uidsOf = (entries, owner) => [...new Set([owner, ...entries.flatMap(e => e.members.map(m => m.uid))])];
+const meName = () => me.displayName || 'لاعب';
+const fmtAt = at => at ? new Date(at).toLocaleString('ar', { dateStyle: 'medium', timeStyle: 'short' }) : '';
+const toLocalInput = at => {
+  if (!at) return '';
+  const d = new Date(at), p = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+};
+
+async function mutateT(id, fn) {
+  const ref = db.collection('tournaments').doc(id);
+  try {
+    await db.runTransaction(async tx => {
+      const t = (await tx.get(ref)).data();
+      if (!t) throw new Error('البطولة غير موجودة');
+      const patch = fn(t);
+      if (!patch) return;
+      if (patch.entries && (t.banned || []).includes(me.uid)) throw new Error('أنت محظور من هذه البطولة');
+      if (patch.entries) patch.uids = uidsOf(patch.entries, t.owner);
+      tx.update(ref, patch);
+    });
+    return true;
+  } catch (e) { toast(e.message); return false; }
+}
+
+function advanceInto(ms, m) {
+  const nx = ms.find(x => x.r === m.r + 1 && x.i === Math.floor(m.i / 2));
+  if (!nx) return;
+  if (m.i % 2 === 0) nx.a = m.w; else nx.b = m.w;
+}
+
+function buildBracket(entries) {
+  const list = shuffle(entries.map(e => ({ id: e.id, name: e.name })));
+  let N = 1; while (N < list.length) N *= 2;
+  const R = Math.round(Math.log2(N));
+  const byes = N - list.length;
+  const ms = [];
+  for (let r = 0; r < R; r++)
+    for (let i = 0; i < N / 2 ** (r + 1); i++) ms.push({ r, i, a: null, b: null, w: null, at: null });
+  let k = 0;
+  for (let i = 0; i < N / 2; i++) { ms[i].a = list[k++]; if (i >= byes) ms[i].b = list[k++]; }
+  ms.slice(0, N / 2).forEach(m => { if (m.a && !m.b) { m.w = m.a; advanceInto(ms, m); } });
+  return ms;
+}
+
+const entryHTML = (e, id, t, isOwner, squad) => `
+  <div class="glass sm">
+    <h4>${squad ? '🛡️ ' + esc(e.name) + ' <span class="chip" style="cursor:default">كود: ' + esc(e.id) + '</span>' : '🎮 ' + esc(e.name)}</h4>
+    ${e.members.map(m => `<p>• ${esc(m.name)}
+      ${squad && m.uid === e.leader ? '<span class="chip" style="cursor:default">القائد</span>' : ''}
+      ${isOwner && m.uid !== t.owner ? `<button class="chip" data-act="kick" data-id="${esc(id)}" data-uid="${esc(m.uid)}">${squad && m.uid === e.leader ? 'طرد السكواد' : 'طرد'}</button><button class="chip" data-act="ban" data-id="${esc(id)}" data-uid="${esc(m.uid)}">حظر</button>` : ''}</p>`).join('')}
+  </div>`;
+
+function bracketHTML(t, id, isOwner) {
+  if (!t.matches || !t.matches.length) return '<p class="muted">لا يوجد جدول</p>';
+  const R = Math.max(...t.matches.map(m => m.r)) + 1;
+  const label = r => r === R - 1 ? 'النهائي' : (r === R - 2 && R > 2) ? 'نصف النهائي' : 'الدور ' + (r + 1);
+  const row = (e, side, m, idx, playable) => {
+    const won = m.w && e && m.w.id === e.id;
+    const click = playable && e ? `data-act="win" data-id="${esc(id)}" data-i="${idx}" data-s="${side}"` : '';
+    return `<div class="mrow ${won ? 'win' : ''}" ${click}>${e ? esc(e.name) : '…'}</div>`;
+  };
+  const final = t.matches.find(m => m.r === R - 1);
+  let out = final && final.w ? `<p style="margin-bottom:10px">🏆 البطل: <b>${esc(final.w.name)}</b></p>` : '';
+  out += '<div class="bracket">';
+  for (let r = 0; r < R; r++) {
+    out += `<div class="round"><h4>${label(r)}</h4>`;
+    t.matches.forEach((m, idx) => {
+      if (m.r !== r) return;
+      const bye = r === 0 && m.a && !m.b;
+      const playable = m.a && m.b && !m.w;
+      out += `<div class="mcard">
+        ${row(m.a, 'a', m, idx, isOwner && playable)}
+        ${bye ? '<div class="mrow muted">تأهل مباشر</div>' : row(m.b, 'b', m, idx, isOwner && playable)}
+        <div class="muted" style="font-size:12px">${m.at ? esc(fmtAt(m.at)) : 'بدون موعد'}</div>
+        ${isOwner && !bye ? `<input type="datetime-local" id="at-${idx}" value="${toLocalInput(m.at)}">
+          <button class="chip" data-act="setAt" data-id="${esc(id)}" data-i="${idx}">حفظ الموعد</button>` : ''}
+      </div>`;
+    });
+    out += '</div>';
+  }
+  return out + '</div>';
+}
+
+function tournamentsView() {
+  app.innerHTML = `<div class="top">مرحباً ${esc(meName())}</div>
+    <div class="glass"><h3>بطولة جديدة</h3>
+      <input id="tn" placeholder="اسم البطولة" maxlength="40">
+      <select id="tmode">
+        <option value="solo">1 ضد 1 (حتى 12 لاعباً)</option>
+        <option value="s4">سكوادات 4 ضد 4 (حتى 8 سكوادات)</option>
+        <option value="s6">سكوادات 6 ضد 6 (حتى 8 سكوادات)</option>
+      </select>
+      <select id="tplay">
+        <option value="no">أنظّم فقط</option>
+        <option value="yes">سألعب في البطولة</option>
+      </select>
+      <h4 style="margin-top:8px">موعد البطولة (اختياري)</h4>
+      <input id="tat" type="datetime-local">
+      <button class="btn" data-act="createT">إنشاء البطولة</button></div>
+    <div class="glass"><h3>فتح بطولة بالكود</h3>
+      <input id="jc" placeholder="كود البطولة" maxlength="6">
+      <button class="btn ghost" data-act="joinT">فتح</button></div>
+    <div id="list" style="padding:0 0 8px"></div>`;
+  listen(db.collection('tournaments').where('uids', 'array-contains', me.uid), s => {
+    const list = s.docs.map(d => ({ id: d.id, ...d.data() }));
+    const el = document.getElementById('list');
+    if (!el) return;
+    el.innerHTML = list.length
+      ? list.map(t => `<div class="glass item" data-act="openT" data-id="${esc(t.id)}">
+          <h3>${esc(t.name)}</h3>
+          <span class="badge">${MODES[t.mode].label}</span>
+          <span class="badge">${t.status === 'open' ? 'مفتوحة' : 'جارية'}</span>
+          ${t.at ? `<p class="muted">${esc(fmtAt(t.at))}</p>` : ''}</div>`).join('')
+      : `<div class="glass empty muted">لا توجد بطولات بعد</div>`;
+  });
+}
+
+function tDetail(id) {
+  listen(db.collection('tournaments').doc(id), s => {
+    const t = s.data();
+    if (!t) { app.innerHTML = `<button class="back" data-act="back">‹ رجوع</button><div class="glass empty">البطولة غير موجودة</div>`; return; }
+    const M = MODES[t.mode];
+    const isOwner = t.owner === me.uid;
+    const joined = t.uids.includes(me.uid);
+    const open = t.status === 'open';
+    const squad = M.size > 1;
+    const full = t.entries.length >= M.max;
+    let html = `<button class="back" data-act="back">‹ رجوع</button>
+      <div class="glass">
+        <h2>${esc(t.name)}</h2>
+        <p class="muted">${M.label} · الكود: <b>${esc(s.id)}</b></p>
+        ${t.at ? `<p class="muted">الموعد: ${esc(fmtAt(t.at))}</p>` : ''}
+        <p class="muted">${open ? 'مفتوحة للتسجيل' : 'البطولة جارية'} · ${t.entries.length}/${M.max} ${squad ? 'سكواد' : 'لاعب'}</p>`;
+    if (open) {
+      html += `<h4 style="margin-top:12px">${squad ? 'السكوادات' : 'اللاعبون'}</h4>`;
+      html += t.entries.length ? t.entries.map(e => entryHTML(e, s.id, t, isOwner, squad)).join('') : '<p class="muted">لا يوجد مسجلون بعد</p>';
+      if (!joined && !full && !isOwner) {
+        html += squad
+          ? `<input id="sqn" placeholder="اسم السكواد الجديد" maxlength="20">
+             <button class="btn" data-act="createSquad" data-id="${esc(s.id)}">إنشاء سكواد</button>
+             <input id="sqc" placeholder="كود سكواد للانضمام" maxlength="6">
+             <button class="btn ghost" data-act="joinSquad" data-id="${esc(s.id)}">انضم لسكواد</button>`
+          : `<button class="btn" data-act="joinSolo" data-id="${esc(s.id)}">انضم للبطولة</button>`;
+      }
+      if (joined && !isOwner) html += `<button class="btn ghost" data-act="leave" data-id="${esc(s.id)}">الخروج من البطولة</button>`;
+      if (isOwner) html += `<button class="btn" data-act="start" data-id="${esc(s.id)}">بدء البطولة</button>`;
+    }
+    html += `</div>`;
+    if (!open) html += `<div class="glass"><h3>الجدول</h3>${bracketHTML(t, s.id, isOwner)}</div>`;
+    app.innerHTML = html;
+  });
+}
+
+Object.assign(handlers, {
+  createT: async () => {
+    const name = document.getElementById('tn').value.trim();
+    const mode = document.getElementById('tmode').value;
+    const plays = document.getElementById('tplay').value === 'yes';
+    const at = document.getElementById('tat').value;
+    if (!name) return toast('اكتب اسم البطولة');
+    const id = newCode();
+    let entries = [];
+    if (plays) {
+      const mem = { uid: me.uid, name: meName() };
+      entries = [mode === 'solo'
+        ? { id: me.uid, name: meName(), leader: me.uid, members: [mem] }
+        : { id: newCode(), name: 'سكواد ' + meName(), leader: me.uid, members: [mem] }];
+    }
+    await db.collection('tournaments').doc(id).set({
+      name, mode, owner: me.uid, ownerPlays: plays,
+      at: at ? new Date(at).toISOString() : null,
+      entries, uids: uidsOf(entries, me.uid), status: 'open', matches: [],
+      createdAt: FV.serverTimestamp()
+    });
+    view.detail = { type: 't', id }; render();
+  },
+
+  joinT: async () => {
+    const id = document.getElementById('jc').value.trim().toUpperCase();
+    if (!id) return toast('أدخل كود البطولة');
+    const snap = await db.collection('tournaments').doc(id).get();
+    if (!snap.exists) return toast('لا توجد بطولة بهذا الكود');
+    view.detail = { type: 't', id }; render();
+  },
+
+  joinSolo: async el => {
+    const ok = await mutateT(el.dataset.id, t => {
+      if (t.status !== 'open') throw new Error('البطولة بدأت');
+      if (t.uids.includes(me.uid)) return null;
+      if (t.entries.length >= MODES[t.mode].max) throw new Error('البطولة ممتلئة');
+      return { entries: [...t.entries, { id: me.uid, name: meName(), leader: me.uid, members: [{ uid: me.uid, name: meName() }] }] };
+    });
+    if (ok) toast('تم تسجيلك في البطولة');
+  },
+
+  createSquad: async el => {
+    const name = document.getElementById('sqn').value.trim() || ('سكواد ' + meName());
+    const ok = await mutateT(el.dataset.id, t => {
+      if (t.status !== 'open') throw new Error('البطولة بدأت');
+      if (t.uids.includes(me.uid)) throw new Error('أنت مسجل بالفعل');
+      if (t.entries.length >= MODES[t.mode].max) throw new Error('عدد السكوادات مكتمل');
+      return { entries: [...t.entries, { id: newCode(), name, leader: me.uid, members: [{ uid: me.uid, name: meName() }] }] };
+    });
+    if (ok) toast('تم إنشاء السكواد. شارك كوده مع أعضائه');
+  },
+
+  joinSquad: async el => {
+    const code = document.getElementById('sqc').value.trim().toUpperCase();
+    const ok = await mutateT(el.dataset.id, t => {
+      if (t.status !== 'open') throw new Error('البطولة بدأت');
+      if (t.uids.includes(me.uid)) throw new Error('أنت مسجل بالفعل');
+      const sq = t.entries.find(e => e.id === code);
+      if (!sq) throw new Error('لا يوجد سكواد بهذا الكود');
+      if (sq.members.length >= MODES[t.mode].size) throw new Error('السكواد مكتمل');
+      return { entries: t.entries.map(e => e.id === code ? { ...e, members: [...e.members, { uid: me.uid, name: meName() }] } : e) };
+    });
+    if (ok) toast('تم انضمامك للسكواد');
+  },
+
+  leave: async el => {
+    const ok = await mutateT(el.dataset.id, t => {
+      if (t.status !== 'open') throw new Error('لا يمكن الخروج بعد بدء البطولة');
+      const mine = t.entries.find(e => e.members.some(m => m.uid === me.uid));
+      if (!mine) return null;
+      if (mine.leader === me.uid && mine.members.length > 1) throw new Error('قائد السكواد لا يخرج والسكواد فيه أعضاء');
+      return { entries: t.entries.map(e => ({ ...e, members: e.members.filter(m => m.uid !== me.uid) })).filter(e => e.members.length > 0) };
+    });
+    if (ok) toast('تم خروجك من البطولة');
+  },
+
+  kick: async el => {
+    const uid = el.dataset.uid;
+    await mutateT(el.dataset.id, t => {
+      if (t.status !== 'open') throw new Error('لا يمكن الطرد بعد بدء البطولة');
+      if (uid === t.owner) throw new Error('لا يمكن طرد المنظم');
+      return { entries: t.entries.filter(e => e.leader !== uid).map(e => ({ ...e, members: e.members.filter(m => m.uid !== uid) })).filter(e => e.members.length > 0) };
+    });
+  },
+
+  start: async el => {
+    const ok = await mutateT(el.dataset.id, t => {
+      if (t.owner !== me.uid) throw new Error('المنظم فقط');
+      if (t.status !== 'open') throw new Error('البطولة بدأت بالفعل');
+      if (t.entries.length < 2) throw new Error('يجب أن يسجل فريقان على الأقل');
+      if (t.entries.some(e => e.members.length < MODES[t.mode].size)) throw new Error('بعض السكوادات غير مكتملة');
+      return { status: 'started', matches: buildBracket(t.entries) };
+    });
+    if (ok) toast('بدأت البطولة وتم توزيع الجدول');
+  },
+
+  win: async el => {
+    const idx = +el.dataset.i, side = el.dataset.s;
+    await mutateT(el.dataset.id, t => {
+      if (t.owner !== me.uid) throw new Error('المنظم فقط');
+      const ms = t.matches.map(m => ({ ...m }));
+      const m = ms[idx];
+      if (!m || !m.a || !m.b || m.w) throw new Error('لا يمكن تسجيل هذه المباراة الآن');
+      const nx = ms.find(x => x.r === m.r + 1 && x.i === Math.floor(m.i / 2));
+      if (nx && nx.w) throw new Error('المرحلة التالية بدأت، لا يمكن تغيير النتيجة');
+      m.w = side === 'a' ? m.a : m.b;
+      advanceInto(ms, m);
+      return { matches: ms };
+    });
+  },
+
+  setAt: async el => {
+    const idx = +el.dataset.i;
+    const val = document.getElementById('at-' + idx).value;
+    const ok = await mutateT(el.dataset.id, t => {
+      if (t.owner !== me.uid) throw new Error('المنظم فقط');
+      return { matches: t.matches.map((m, k) => k === idx ? { ...m, at: val ? new Date(val).toISOString() : null } : m) };
+    });
+    if (ok) toast('تم حفظ موعد المباراة');
+  }
+});
+
+/* ==== الظهور: بطولات عامة للجميع، وخاصة بالكود فقط ==== */
+function tournamentsView() {
+  app.innerHTML = `<div class="top">مرحباً ${esc(meName())}</div>
+    <div class="glass"><h3>بطولة جديدة</h3>
+      <input id="tn" placeholder="اسم البطولة" maxlength="40">
+      <select id="tmode">
+        <option value="solo">1 ضد 1 (حتى 12 لاعباً)</option>
+        <option value="s4">سكوادات 4 ضد 4 (حتى 8 سكوادات)</option>
+        <option value="s6">سكوادات 6 ضد 6 (حتى 8 سكوادات)</option>
+      </select>
+      <select id="tvis">
+        <option value="public">عامة (تظهر للجميع)</option>
+        <option value="private">خاصة (بالكود فقط)</option>
+      </select>
+      <select id="tplay">
+        <option value="no">أنظّم فقط</option>
+        <option value="yes">سألعب في البطولة</option>
+      </select>
+      <h4 style="margin-top:8px">موعد البطولة (اختياري)</h4>
+      <input id="tat" type="datetime-local">
+      <button class="btn" data-act="createT">إنشاء البطولة</button></div>
+    <div class="glass"><h3>فتح بطولة بالكود</h3>
+      <input id="jc" placeholder="كود البطولة" maxlength="6">
+      <button class="btn ghost" data-act="joinT">فتح</button></div>
+    <div id="mine"></div>
+    <div id="pub"></div>`;
+
+  let mineDocs = [], pubDocs = [];
+  const card = (t, joined) => `<div class="glass item" data-act="openT" data-id="${esc(t.id)}">
+      <h3>${esc(t.name)}</h3>
+      <span class="badge">${MODES[t.mode].label}</span>
+      <span class="badge">${t.status === 'open' ? 'مفتوحة' : 'جارية'}</span>
+      <span class="badge">${t.visibility === 'public' ? 'عامة' : 'خاصة'}</span>
+      ${joined ? '<span class="badge">منضم</span>' : ''}
+      ${t.at ? `<p class="muted">${esc(fmtAt(t.at))}</p>` : ''}</div>`;
+  const paint = () => {
+    const m = document.getElementById('mine'), p = document.getElementById('pub');
+    if (!m || !p) return;
+    const mineIds = mineDocs.map(t => t.id);
+    const others = pubDocs.filter(t => !mineIds.includes(t.id));
+    m.innerHTML = mineDocs.length ? `<h3 style="margin:14px 22px 0">بطولاتي</h3>` + mineDocs.map(t => card(t, true)).join('') : '';
+    p.innerHTML = others.length ? `<h3 style="margin:14px 22px 0">بطولات عامة</h3>` + others.map(t => card(t, false)).join('') : '';
+    if (!mineDocs.length && !others.length) p.innerHTML = `<div class="glass empty muted">لا توجد بطولات بعد. أنشئ واحدة أو افتح بطولة خاصة بالكود.</div>`;
+  };
+  listen(db.collection('tournaments').where('uids', 'array-contains', me.uid), s => {
+    mineDocs = s.docs.map(d => ({ id: d.id, ...d.data() })); paint();
+  });
+  listen(db.collection('tournaments').where('visibility', '==', 'public'), s => {
+    pubDocs = s.docs.map(d => ({ id: d.id, ...d.data() })); paint();
+  });
+}
+
+Object.assign(handlers, {
+  createT: async () => {
+    const name = document.getElementById('tn').value.trim();
+    const mode = document.getElementById('tmode').value;
+    const visibility = document.getElementById('tvis').value;
+    const plays = document.getElementById('tplay').value === 'yes';
+    const at = document.getElementById('tat').value;
+    if (!name) return toast('اكتب اسم البطولة');
+    const id = newCode();
+    let entries = [];
+    if (plays) {
+      const mem = { uid: me.uid, name: meName() };
+      entries = [mode === 'solo'
+        ? { id: me.uid, name: meName(), leader: me.uid, members: [mem] }
+        : { id: newCode(), name: 'سكواد ' + meName(), leader: me.uid, members: [mem] }];
+    }
+    await db.collection('tournaments').doc(id).set({
+      name, mode, visibility, owner: me.uid, ownerPlays: plays,
+      at: at ? new Date(at).toISOString() : null,
+      entries, uids: uidsOf(entries, me.uid), status: 'open', matches: [],
+      createdAt: FV.serverTimestamp()
+    });
+    view.detail = { type: 't', id }; render();
+  }
+});
+
+Object.assign(handlers, {
+  ban: async el => {
+    const uid = el.dataset.uid;
+    const ok = await mutateT(el.dataset.id, t => {
+      if (t.owner !== me.uid) throw new Error('المنظم فقط');
+      if (uid === t.owner) throw new Error('لا يمكن حظر المنظم');
+      const banned = [...new Set([...(t.banned || []), uid])];
+      const entries = t.entries
+        .filter(e => e.leader !== uid)
+        .map(e => ({ ...e, members: e.members.filter(m => m.uid !== uid) }))
+        .filter(e => e.members.length > 0);
+      return { entries, banned };
+    });
+    if (ok) toast('تم حظر اللاعب، ولن يتمكن من الدخول مجدداً');
+  }
+});
+
+/* ==== النتائج والفائز: نتيجة المباراة، زر فائز لكل لاعب، وتأثيرات للفائز ==== */
+document.head.insertAdjacentHTML('beforeend', `<style>
+.mrow{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.mright{display:flex;align-items:center;gap:6px}
+.score{width:58px;padding:6px;margin:0;font-size:14px;text-align:center}
+.mrow.win{background:linear-gradient(135deg,var(--a),var(--b));color:#fff;font-weight:700;animation:glowWin 1.8s ease-in-out infinite}
+.mrow.win::after{content:'✦';margin-inline-start:6px;animation:spark 1s ease-in-out infinite}
+.mrow.lose{opacity:.5}
+@keyframes glowWin{0%,100%{box-shadow:0 0 6px rgba(255,138,61,.4)}50%{box-shadow:0 0 22px 4px rgba(255,46,99,.75)}}
+@keyframes spark{0%,100%{opacity:.4}50%{opacity:1}}
+</style>`);
+
+function bracketHTML(t, id, isOwner) {
+  if (!t.matches || !t.matches.length) return '<p class="muted">لا يوجد جدول</p>';
+  const R = Math.max(...t.matches.map(m => m.r)) + 1;
+  const label = r => r === R - 1 ? 'النهائي' : (r === R - 2 && R > 2) ? 'نصف النهائي' : 'الدور ' + (r + 1);
+  const row = (e, side, m, idx, playable) => {
+    const won = !!(m.w && e && m.w.id === e.id);
+    const lost = !!(m.w && e && !won);
+    let right = '';
+    if (won) right = '<span class="chip" style="cursor:default">🏆 فائز</span>';
+    else if (playable && e) right = `<button class="chip" data-act="win" data-id="${esc(id)}" data-i="${idx}" data-s="${side}">فائز</button>`;
+    let scoreHTML = '';
+    if (playable && e) scoreHTML = `<input type="number" min="0" class="score" id="sc-${idx}-${side}" placeholder="0">`;
+    else if (m.w && e && m.sa != null) scoreHTML = `<b>${side === 'a' ? m.sa : m.sb}</b>`;
+    return `<div class="mrow ${won ? 'win' : ''} ${lost ? 'lose' : ''}"><span>${e ? esc(e.name) : '…'}</span><span class="mright">${scoreHTML}${right}</span></div>`;
+  };
+  const final = t.matches.find(m => m.r === R - 1);
+  let out = final && final.w ? `<p style="margin-bottom:10px">🏆 البطل: <b>${esc(final.w.name)}</b></p>` : '';
+  out += '<div class="bracket">';
+  for (let r = 0; r < R; r++) {
+    out += `<div class="round"><h4>${label(r)}</h4>`;
+    t.matches.forEach((m, idx) => {
+      if (m.r !== r) return;
+      const bye = r === 0 && m.a && !m.b;
+      const playable = !!(m.a && m.b && !m.w);
+      out += `<div class="mcard">
+        ${row(m.a, 'a', m, idx, isOwner && playable)}
+        ${bye ? '<div class="mrow muted">تأهل مباشر</div>' : row(m.b, 'b', m, idx, isOwner && playable)}
+        <div class="muted" style="font-size:12px;margin-top:6px">${m.at ? esc(fmtAt(m.at)) : 'بدون موعد'}</div>
+        ${isOwner && !bye ? `<input type="datetime-local" id="at-${idx}" value="${toLocalInput(m.at)}">
+          <button class="chip" data-act="setAt" data-id="${esc(id)}" data-i="${idx}">حفظ الموعد</button>` : ''}
+      </div>`;
+    });
+    out += '</div>';
+  }
+  return out + '</div>';
+}
+
+Object.assign(handlers, {
+  win: async el => {
+    const idx = +el.dataset.i, side = el.dataset.s;
+    const sa = (document.getElementById(`sc-${idx}-a`) || {}).value;
+    const sb = (document.getElementById(`sc-${idx}-b`) || {}).value;
+    if (!sa || !sb) return toast('اكتب نتيجة المباراة للاعبين معاً');
+    const A = +sa, B = +sb;
+    const ok = await mutateT(el.dataset.id, t => {
+      if (t.owner !== me.uid) throw new Error('المنظم فقط');
+      const ms = t.matches.map(m => ({ ...m }));
+      const m = ms[idx];
+      if (!m || !m.a || !m.b || m.w) throw new Error('لا يمكن تسجيل هذه المباراة الآن');
+      if (side === 'a' && A <= B) throw new Error('نتيجة الفائز يجب أن تكون أعلى');
+      if (side === 'b' && B <= A) throw new Error('نتيجة الفائز يجب أن تكون أعلى');
+      const nx = ms.find(x => x.r === m.r + 1 && x.i === Math.floor(m.i / 2));
+      if (nx && nx.w) throw new Error('المرحلة التالية بدأت، لا يمكن تغيير النتيجة');
+      m.sa = A; m.sb = B;
+      m.w = side === 'a' ? m.a : m.b;
+      advanceInto(ms, m);
+      return { matches: ms };
+    });
+    if (ok) toast('تم تسجيل الفائز');
+  }
+});
+
+/* ==== حالة البطولة: بدأت بشكل لافت، وتختفي من العامة بعد النهائي ==== */
+document.head.insertAdjacentHTML('beforeend', `<style>
+.live{display:block;font-size:24px;font-weight:900;background:linear-gradient(90deg,#ff8a3d,#ff2e63,#ffd166,#ff8a3d);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 2.5s linear infinite;margin:8px 0 12px}
+@keyframes shine{to{background-position:200% center}}
+</style>`);
+
+const bannerOf = t => t.status === 'finished'
+  ? '<div class="live">🏆 انتهت البطولة</div>'
+  : '<div class="live">🔥 بدأت البطولة</div>';
+
+const _bracketBase = bracketHTML;
+bracketHTML = function (t, id, isOwner) { return bannerOf(t) + _bracketBase(t, id, isOwner); };
+
+function tournamentsView() {
+  app.innerHTML = `<div class="top">مرحباً ${esc(meName())}</div>
+    <div class="glass"><h3>بطولة جديدة</h3>
+      <input id="tn" placeholder="اسم البطولة" maxlength="40">
+      <select id="tmode">
+        <option value="solo">1 ضد 1 (حتى 12 لاعباً)</option>
+        <option value="s4">سكوادات 4 ضد 4 (حتى 8 سكوادات)</option>
+        <option value="s6">سكوادات 6 ضد 6 (حتى 8 سكوادات)</option>
+      </select>
+      <select id="tvis">
+        <option value="public">عامة (تظهر للجميع)</option>
+        <option value="private">خاصة (بالكود فقط)</option>
+      </select>
+      <select id="tplay">
+        <option value="no">أنظّم فقط</option>
+        <option value="yes">سألعب في البطولة</option>
+      </select>
+      <h4 style="margin-top:8px">موعد البطولة (اختياري)</h4>
+      <input id="tat" type="datetime-local">
+      <button class="btn" data-act="createT">إنشاء البطولة</button></div>
+    <div class="glass"><h3>فتح بطولة بالكود</h3>
+      <input id="jc" placeholder="كود البطولة" maxlength="6">
+      <button class="btn ghost" data-act="joinT">فتح</button></div>
+    <div id="mine"></div>
+    <div id="pub"></div>`;
+
+  let mineDocs = [], pubDocs = [];
+  const status = t => t.status === 'open' ? '<span class="badge">مفتوحة للتسجيل</span>'
+    : t.status === 'started' ? '<div class="live" style="font-size:20px;margin:6px 0">🔥 بدأت البطولة</div>'
+    : '<span class="badge">انتهت</span>';
+  const card = (t, joined) => `<div class="glass item" data-act="openT" data-id="${esc(t.id)}">
+      <h3>${esc(t.name)}</h3>
+      <span class="badge">${MODES[t.mode].label}</span>
+      <span class="badge">${t.visibility === 'public' ? 'عامة' : 'خاصة'}</span>
+      ${joined ? '<span class="badge">منضم</span>' : ''}
+      ${status(t)}
+      ${t.at ? `<p class="muted">${esc(fmtAt(t.at))}</p>` : ''}</div>`;
+  const paint = () => {
+    const m = document.getElementById('mine'), p = document.getElementById('pub');
+    if (!m || !p) return;
+    const mineIds = mineDocs.map(t => t.id);
+    const others = pubDocs.filter(t => !mineIds.includes(t.id) && t.status !== 'finished');
+    m.innerHTML = mineDocs.length ? `<h3 style="margin:14px 22px 0">بطولاتي</h3>` + mineDocs.map(t => card(t, true)).join('') : '';
+    p.innerHTML = others.length ? `<h3 style="margin:14px 22px 0">بطولات عامة</h3>` + others.map(t => card(t, false)).join('') : '';
+    if (!mineDocs.length && !others.length) p.innerHTML = `<div class="glass empty muted">لا توجد بطولات بعد. أنشئ واحدة أو افتح بطولة خاصة بالكود.</div>`;
+  };
+  listen(db.collection('tournaments').where('uids', 'array-contains', me.uid), s => {
+    mineDocs = s.docs.map(d => ({ id: d.id, ...d.data() })); paint();
+  });
+  listen(db.collection('tournaments').where('visibility', '==', 'public'), s => {
+    pubDocs = s.docs.map(d => ({ id: d.id, ...d.data() })); paint();
+  });
+}
+
+Object.assign(handlers, {
+  win: async el => {
+    const idx = +el.dataset.i, side = el.dataset.s;
+    const sa = (document.getElementById(`sc-${idx}-a`) || {}).value;
+    const sb = (document.getElementById(`sc-${idx}-b`) || {}).value;
+    if (!sa || !sb) return toast('اكتب نتيجة المباراة للاعبين معاً');
+    const A = +sa, B = +sb;
+    const ok = await mutateT(el.dataset.id, t => {
+      if (t.owner !== me.uid) throw new Error('المنظم فقط');
+      const ms = t.matches.map(m => ({ ...m }));
+      const m = ms[idx];
+      if (!m || !m.a || !m.b || m.w) throw new Error('لا يمكن تسجيل هذه المباراة الآن');
+      if (side === 'a' && A <= B) throw new Error('نتيجة الفائز يجب أن تكون أعلى');
+      if (side === 'b' && B <= A) throw new Error('نتيجة الفائز يجب أن تكون أعلى');
+      const nx = ms.find(x => x.r === m.r + 1 && x.i === Math.floor(m.i / 2));
+      if (nx && nx.w) throw new Error('المرحلة التالية بدأت، لا يمكن تغيير النتيجة');
+      m.sa = A; m.sb = B;
+      m.w = side === 'a' ? m.a : m.b;
+      advanceInto(ms, m);
+      const finalRound = Math.max(...ms.map(x => x.r));
+      return { matches: ms, status: m.r === finalRound ? 'finished' : t.status };
+    });
+    if (ok) toast('تم تسجيل الفائز');
+  }
+});
+
+/* ==== اختيار اللعب أو المشاهدة بأزرار زجاجية، وحذف بطولاتي ==== */
+document.head.insertAdjacentHTML('beforeend', `<style>
+.segs{display:flex;gap:8px;margin:6px 0}
+.seg{flex:1;padding:12px 8px;border-radius:18px;border:1px solid var(--stroke);background:rgba(255,255,255,.1);color:#fff;font:inherit;font-size:15px;cursor:pointer;box-shadow:inset 0 1px 0 var(--hi)}
+.seg.on{background:linear-gradient(135deg,var(--a),var(--b));font-weight:700;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 8px 20px rgba(255,46,99,.35)}
+</style>`);
+
+function tournamentsView() {
+  app.innerHTML = `<div class="top">مرحباً ${esc(meName())}</div>
+    <div class="glass"><h3>بطولة جديدة</h3>
+      <input id="tn" placeholder="اسم البطولة" maxlength="40">
+      <input type="hidden" id="tmode" value="solo">
+      <div class="segs">
+        <button class="seg on" data-act="pick" data-f="tmode" data-v="solo">1 ضد 1<small>حتى 12 لاعباً</small></button>
+        <button class="seg" data-act="pick" data-f="tmode" data-v="s4">4 ضد 4<small>حتى 8 سكوادات</small></button>
+        <button class="seg" data-act="pick" data-f="tmode" data-v="s6">6 ضد 6<small>حتى 8 سكوادات</small></button>
+      </div>
+      <input type="hidden" id="tvis" value="public">
+      <div class="segs">
+        <button class="seg on" data-act="pick" data-f="tvis" data-v="public">🌍 عامة</button>
+        <button class="seg" data-act="pick" data-f="tvis" data-v="private">🔒 خاصة بالكود</button>
+      </div>
+      <input type="hidden" id="tplay" value="no">
+      <div class="segs">
+        <button class="seg" data-act="pick" data-v="yes">🎮 أريد اللعب</button>
+        <button class="seg on" data-act="pick" data-v="no">👀 أريد المشاهدة</button>
+      </div>
+      <h4 style="margin-top:8px">موعد البطولة (اختياري)</h4>
+      <input id="tat" type="datetime-local">
+      <button class="btn" data-act="createT">إنشاء البطولة</button></div>
+    <div class="glass"><h3>فتح بطولة بالكود</h3>
+      <input id="jc" placeholder="كود البطولة" maxlength="6">
+      <button class="btn ghost" data-act="joinT">فتح</button></div>
+    <div id="mine"></div>
+    <div id="pub"></div>`;
+
+  let mineDocs = [], pubDocs = [];
+  const status = t => t.status === 'open' ? '<span class="badge">مفتوحة للتسجيل</span>'
+    : t.status === 'started' ? '<div class="live" style="font-size:20px;margin:6px 0">🔥 بدأت البطولة</div>'
+    : '<span class="badge">انتهت</span>';
+  const card = (t, joined) => `<div class="glass item" data-act="openT" data-id="${esc(t.id)}">
+      <h3>${esc(t.name)}</h3>
+      <span class="badge">${MODES[t.mode].label}</span>
+      <span class="badge">${t.visibility === 'public' ? 'عامة' : 'خاصة'}</span>
+      ${joined ? '<span class="badge">منضم</span>' : ''}
+      ${status(t)}
+      ${t.at ? `<p class="muted">${esc(fmtAt(t.at))}</p>` : ''}
+      ${t.owner === me.uid ? `<div style="margin-top:8px"><button class="chip" data-act="delT" data-id="${esc(t.id)}">🗑️ حذف البطولة</button></div>` : ''}</div>`;
+  const paint = () => {
+    const m = document.getElementById('mine'), p = document.getElementById('pub');
+    if (!m || !p) return;
+    const mineIds = mineDocs.map(t => t.id);
+    const others = pubDocs.filter(t => !mineIds.includes(t.id) && t.status !== 'finished');
+    m.innerHTML = mineDocs.length ? `<h3 style="margin:14px 22px 0">بطولاتي</h3>` + mineDocs.map(t => card(t, true)).join('') : '';
+    p.innerHTML = others.length ? `<h3 style="margin:14px 22px 0">بطولات عامة</h3>` + others.map(t => card(t, false)).join('') : '';
+    if (!mineDocs.length && !others.length) p.innerHTML = `<div class="glass empty muted">لا توجد بطولات بعد. أنشئ واحدة أو افتح بطولة خاصة بالكود.</div>`;
+  };
+  listen(db.collection('tournaments').where('uids', 'array-contains', me.uid), s => {
+    mineDocs = s.docs.map(d => ({ id: d.id, ...d.data() })); paint();
+  });
+  listen(db.collection('tournaments').where('visibility', '==', 'public'), s => {
+    pubDocs = s.docs.map(d => ({ id: d.id, ...d.data() })); paint();
+  });
+}
+
+Object.assign(handlers, {
+  pick: el => {
+    document.getElementById('tplay').value = el.dataset.v;
+    document.querySelectorAll('.seg').forEach(b => b.classList.toggle('on', b === el));
+  },
+  delT: async el => {
+    if (!(await askConfirm('هل تريد حذف هذه البطولة نهائياً؟ لا يمكن التراجع'))) return;
+    try {
+      await db.collection('tournaments').doc(el.dataset.id).delete();
+      toast('تم حذف البطولة');
+    } catch (e) { toast('تعذر الحذف: ' + e.message); }
+  }
+});
+
+/* ==== نوافذ التطبيق نفسه بدل نوافذ المتصفح ==== */
+document.head.insertAdjacentHTML('beforeend', `<style>
+.ov{position:fixed;inset:0;background:rgba(5,3,12,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
+.dlg{width:100%;max-width:340px;border-radius:30px;padding:22px;background:linear-gradient(145deg,rgba(255,255,255,.28),rgba(255,255,255,.07));backdrop-filter:blur(30px) saturate(200%);-webkit-backdrop-filter:blur(30px) saturate(200%);border:1px solid var(--stroke);box-shadow:inset 0 1px 0 var(--hi),0 20px 50px rgba(0,0,0,.45);animation:pop .25s ease-out}
+.dlg p{font-size:17px;line-height:1.7;text-align:center;margin-bottom:14px}
+.dlg input{margin-top:0}
+.dlg .row{display:flex;gap:10px}
+.dlg .row .btn{margin-top:0}
+.toastx{position:fixed;bottom:112px;left:50%;transform:translateX(-50%);padding:12px 20px;border-radius:24px;background:rgba(20,12,35,.72);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid var(--stroke);box-shadow:inset 0 1px 0 var(--hi),0 12px 30px rgba(0,0,0,.4);z-index:101;font-size:15px;width:max-content;max-width:88%;text-align:center;animation:pop .25s ease-out}
+@keyframes pop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+</style>`);
+
+function askDialog({ text, input = false, ok = 'تأكيد', cancel = 'إلغاء' }) {
+  return new Promise(resolve => {
+    const ov = document.createElement('div');
+    ov.className = 'ov';
+    ov.innerHTML = `<div class="dlg"><p>${esc(text)}</p>
+      ${input ? '<input id="dlgIn" maxlength="40">' : ''}
+      <div class="row"><button class="btn ghost" id="dlgNo">${cancel}</button><button class="btn" id="dlgYes">${ok}</button></div></div>`;
+    document.body.appendChild(ov);
+    const done = v => { ov.remove(); resolve(v); };
+    ov.querySelector('#dlgNo').onclick = () => done(input ? null : false);
+    ov.querySelector('#dlgYes').onclick = () => done(input ? (ov.querySelector('#dlgIn').value.trim() || null) : true);
+    if (input) setTimeout(() => ov.querySelector('#dlgIn').focus(), 50);
+  });
+}
+const askConfirm = text => askDialog({ text });
+const askText = text => askDialog({ text, input: true, ok: 'حفظ' });
+
+function showToast(msg) {
+  const el = document.createElement('div');
+  el.className = 'toastx';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2600);
+}
+
+Object.assign(handlers, {
+  pick: el => {
+    const f = el.dataset.f || 'tplay';
+    document.getElementById(f).value = el.dataset.v;
+    el.parentElement.querySelectorAll('.seg').forEach(b => b.classList.toggle('on', b === el));
+  }
+});
+
+Object.assign(FR, {
+  '1 ضد 1': '1 contre 1', '4 ضد 4': '4 contre 4', '6 ضد 6': '6 contre 6',
+  'حتى 12 لاعباً': "jusqu'à 12 joueurs", 'حتى 8 سكوادات': "jusqu'à 8 escouades",
+  '🌍 عامة': '🌍 Publique', '🔒 خاصة بالكود': '🔒 Privée (code)',
+  '🎮 أريد اللعب': '🎮 Je joue', '👀 أريد المشاهدة': '👀 Je regarde',
+  'تأكيد': 'Confirmer', 'إلغاء': 'Annuler', 'حفظ': 'Enregistrer'
+});
+document.head.insertAdjacentHTML('beforeend', `<style>.seg small{display:block;font-size:12px;opacity:.75;font-weight:400;margin-top:2px}</style>`);
+
+/* ==== إشعار حروب الرابطة ==== */
+document.head.insertAdjacentHTML('beforeend', `<style>
+.alertx{position:fixed;top:calc(12px + env(safe-area-inset-top));left:12px;right:12px;padding:14px 18px;border-radius:26px;background:rgba(20,12,35,.72);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid var(--stroke);box-shadow:inset 0 1px 0 var(--hi),0 14px 34px rgba(0,0,0,.45);z-index:102;text-align:center;animation:pop .3s ease-out}
+.alertx b{font-size:16px}
+</style>`);
+
+const _cdBase = cDetail;
+cDetail = function (id) {
+  _cdBase(id);
+  document.getElementById('chead').insertAdjacentHTML('afterend', '<div class="glass" id="warBox" style="display:none"></div>');
+  listen(db.collection('clans').doc(id), s => {
+    const c = s.data(), box = document.getElementById('warBox');
+    if (!box || !c) return;
+    const isLeader = c.leader === me.uid;
+    box.style.display = isLeader ? '' : 'none';
+    box.innerHTML = isLeader
+      ? `<h3>حروب الرابطة</h3><p class="muted">أرسل إشعاراً لكل أعضاء الكلان</p>
+         <button class="btn" data-act="warAlert" data-id="${esc(id)}">🔔 حان وقت حروب الرابطة</button>`
+      : '';
+  });
+};
+
+/* ==== إدارة الكلان: الأعضاء، المساعدون، الطرد، الخروج ==== */
+const _cdPrev = cDetail;
+cDetail = function (id) {
+  _cdPrev(id);
+  document.getElementById('chead').insertAdjacentHTML('afterend', '<div class="glass" id="mgmtBox"></div>');
+  listen(db.collection('clans').doc(id), s => {
+    const c = s.data(), box = document.getElementById('mgmtBox');
+    if (!c) {
+      if (view.detail && view.detail.type === 'c' && view.detail.id === id) {
+        view.detail = null; render(); toast('تم إغلاق هذا الكلان');
+      }
+      return;
+    }
+    if (!box) return;
+    const assistants = c.assistants || [];
+    const role = c.leader === me.uid ? 'leader' : assistants.includes(me.uid) ? 'assistant' : 'member';
+    const rows = c.members.map(m => {
+      const isLead = m.uid === c.leader, isAss = assistants.includes(m.uid), isMe = m.uid === me.uid;
+      const label = isLead ? 'القائد' : isAss ? 'مساعد' : 'عضو';
+      let btns = '';
+      if (!isMe && !isLead) {
+        if (role === 'leader') {
+          btns += isAss
+            ? `<button class="chip" data-act="demote" data-id="${esc(id)}" data-uid="${esc(m.uid)}">إزالة المساعد</button>`
+            : `<button class="chip" data-act="promote" data-id="${esc(id)}" data-uid="${esc(m.uid)}">ترقية لمساعد</button>`;
+        }
+        if ((role === 'leader' || role === 'assistant') && !(role === 'assistant' && isAss)) {
+          btns += `<button class="chip" data-act="clanKick" data-id="${esc(id)}" data-uid="${esc(m.uid)}">طرد</button>`;
+        }
+      }
+      return `<p>• ${esc(m.name)} <span class="chip" style="cursor:default">${label}</span> ${btns}</p>`;
+    }).join('');
+    const leave = role === 'leader'
+      ? `<button class="btn" style="background:linear-gradient(135deg,#7a0019,#ff2e63)" data-act="closeClan" data-id="${esc(id)}">🔒 إغلاق الكلان نهائياً</button>`
+      : `<button class="btn ghost" data-act="clanLeave" data-id="${esc(id)}">الخروج من الكلان</button>`;
+    box.innerHTML = `<h3>الأعضاء (${c.members.length}) · المساعدون ${assistants.length}/2</h3>${rows}${leave}`;
+  });
+};
+
+async function mutateC(id, fn) {
+  const ref = db.collection('clans').doc(id);
+  try {
+    await db.runTransaction(async tx => {
+      const c = (await tx.get(ref)).data();
+      if (!c) throw new Error('الكلان غير موجود');
+      const patch = fn(c);
+      if (!patch) return;
+      patch.uids = [...new Set(patch.members.map(m => m.uid))];
+      tx.update(ref, patch);
+    });
+    return true;
+  } catch (e) { toast(e.message); return false; }
+}
+
+Object.assign(handlers, {
+  promote: async el => {
+    const uid = el.dataset.uid;
+    const ok = await mutateC(el.dataset.id, c => {
+      if (c.leader !== me.uid) throw new Error('القائد فقط يرقّي المساعدين');
+      const a = c.assistants || [];
+      if (a.includes(uid)) return null;
+      if (a.length >= 2) throw new Error('الحد الأقصى للمساعدين مساعدان');
+      return { assistants: [...a, uid], members: c.members };
+    });
+    if (ok) toast('تمت ترقيته إلى مساعد');
+  },
+
+  demote: async el => {
+    const uid = el.dataset.uid;
+    const ok = await mutateC(el.dataset.id, c => {
+      if (c.leader !== me.uid) throw new Error('القائد فقط');
+      return { assistants: (c.assistants || []).filter(x => x !== uid), members: c.members };
+    });
+    if (ok) toast('تمت إزالة المساعد');
+  },
+
+  clanKick: async el => {
+    const uid = el.dataset.uid;
+    if (!(await askConfirm('هل تريد طرد هذا العضو من الكلان؟'))) return;
+    await mutateC(el.dataset.id, c => {
+      const a = c.assistants || [];
+      const myRole = c.leader === me.uid ? 'leader' : a.includes(me.uid) ? 'assistant' : null;
+      if (!myRole) throw new Error('ليست لديك صلاحية الطرد');
+      if (uid === c.leader) throw new Error('لا يمكن طرد القائد');
+      if (myRole === 'assistant' && a.includes(uid)) throw new Error('المساعد لا يطرد مساعداً آخر');
+      return {
+        members: c.members.filter(m => m.uid !== uid),
+        assistants: a.filter(x => x !== uid)
+      };
+    });
+  },
+
+  clanLeave: async el => {
+    if (!(await askConfirm('هل تريد تأكيد الخروج من الكلان؟'))) return;
+    const ok = await mutateC(el.dataset.id, c => {
+      if (c.leader === me.uid) throw new Error('القائد لا يستطيع الخروج من كلانه');
+      return {
+        members: c.members.filter(m => m.uid !== me.uid),
+        assistants: (c.assistants || []).filter(x => x !== me.uid)
+      };
+    });
+    if (ok) { view.detail = null; render(); toast('تم خروجك من الكلان'); }
+  }
+});
+
+Object.assign(handlers, {
+  closeClan: async el => {
+    const id = el.dataset.id;
+    const ref = db.collection('clans').doc(id);
+    const c = (await ref.get()).data();
+    if (!c || c.leader !== me.uid) return toast('القائد فقط يستطيع إغلاق الكلان');
+    if (!(await askConfirm('هل تريد إغلاق الكلان نهائياً؟ سيخرج جميع الأعضاء منه وتُحذف رسائله، ولا يمكن التراجع'))) return;
+    try {
+      const msgs = await ref.collection('messages').get();
+      const alerts = await db.collection('alerts').where('clanId', '==', id).get();
+      const batch = db.batch();
+      msgs.docs.forEach(d => batch.delete(d.ref));
+      alerts.docs.forEach(d => batch.delete(d.ref));
+      batch.delete(ref);
+      await batch.commit();
+      toast('تم إغلاق الكلان وحذفه');
+    } catch (e) { toast('تعذر الإغلاق: ' + e.message); }
+  }
+});
+
+function notify(title, body) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  const opts = { body, icon: 'icon.svg', badge: 'icon.svg', vibrate: [200, 100, 200], tag: 'ff-alert' };
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.ready.then(reg => reg.showNotification(title, opts)).catch(() => {});
+  } else {
+    try { new Notification(title, opts); } catch (e) {}
+  }
+}
+
+function showAlert(a) {
+  const el = document.createElement('div');
+  el.className = 'alertx';
+  el.innerHTML = `<b>🔔 ${esc(a.clanName)}</b><div style="margin-top:4px">${esc(a.text)}</div>`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 8000);
+  notify(a.clanName, a.text);
+}
+
+let alertsStarted = false;
+function startAlerts(uid) {
+  if (alertsStarted) return;
+  alertsStarted = true;
+  let since;
+  try { since = localStorage.getItem('alertsSince') || new Date(0).toISOString(); } catch (e) { since = new Date(0).toISOString(); }
+  db.collection('alerts').where('uids', 'array-contains', uid).onSnapshot(s => {
+    s.docChanges().forEach(c => {
+      if (c.type !== 'added') return;
+      const a = c.doc.data();
+      if (a.at > since) showAlert(a);
+    });
+    since = new Date().toISOString();
+    try { localStorage.setItem('alertsSince', since); } catch (e) {}
+  });
+}
+auth.onAuthStateChanged(u => { if (u) startAlerts(u.uid); });
+
+Object.assign(handlers, {
+  warAlert: async el => {
+    const id = el.dataset.id;
+    const clan = (await db.collection('clans').doc(id).get()).data();
+    if (!clan || clan.leader !== me.uid) return toast('القائد فقط');
+    if (!(await askConfirm('هل تريد إرسال إشعار حروب الرابطة لكل أعضاء الكلان؟'))) return;
+    if (window.Notification && Notification.permission === 'default') {
+      try { await Notification.requestPermission(); } catch (e) {}
+    }
+    await db.collection('alerts').add({
+      clanId: id, clanName: clan.name, uids: clan.uids,
+      text: 'حان وقت حروب الرابطة 🔥', by: meName(), at: new Date().toISOString()
+    });
+    toast('تم إرسال الإشعار لأعضاء الكلان');
+  }
+});
+
+document.addEventListener('change', async e => {
+  if (e.target.id !== 'pf' || !e.target.files[0]) return;
+  try {
+    pendingPhoto = await resizeImage(e.target.files[0]);
+    toast('تم اختيار الصورة. اضغط حفظ التغييرات');
+  } catch (err) { toast('تعذر قراءة الصورة'); }
+});
+
+document.addEventListener('click', async e => {
+  const el = e.target.closest('[data-act]');
+  if (!el || !handlers[el.dataset.act]) return;
+  const ask = { leave: 'هل تريد تأكيد الخروج من البطولة؟', kick: 'هل تريد طرد هذا اللاعب؟', ban: 'هل تريد حظر هذا اللاعب؟ لن يتمكن من الدخول مجدداً', start: 'هل تريد بدء البطولة؟ لن يمكن الطرد أو الخروج بعدها' }[el.dataset.act];
+  if (el.dataset.act === 'back' && document.querySelector('[data-act="start"]') && !(await askConfirm('هل تريد تأكيد الخروج من صفحة البطولة؟'))) return;
+  if (ask && !(await askConfirm(ask))) return;
+  handlers[el.dataset.act](el);
+});
+</script>
+<script>
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+</script>
+</body>
+</html>

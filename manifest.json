@@ -1,0 +1,15 @@
+{
+  "name": "تنظيم فري فاير",
+  "short_name": "فري فاير",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0712",
+  "theme_color": "#0b0712",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
